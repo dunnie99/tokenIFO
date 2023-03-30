@@ -3,10 +3,21 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract launchPadIFO {
+    
     event createdPad(
         string indexed tokenName,
         uint indexed duration,
         uint indexed totalSupply
+    );
+    event launched(
+        address moderator,
+        uint256 indexed _padId,
+        string indexed _tokenName
+    );
+    event stakeSuccessful(
+        uint256 indexed _amount,
+        uint256 indexed _padId,
+        string indexed _tokenName
     );
     event Received(address, uint);
 
@@ -22,10 +33,10 @@ contract launchPadIFO {
 
     address moderator;
     mapping(uint256 => bool) idUsed;
-    mapping(uint256 => Pad) internal padIds;
     mapping(string => Pad) tokenPadNames;
+    mapping(uint256 => Pad) internal padIds;
     mapping(address => bool) tokenAlreadyLaunched;
-    mapping(address => mapping(address => uint256)) amountBought;
+    mapping(address => mapping(uint256 => uint256)) amountBought;
 
     uint256[] public padIDs;
 
@@ -77,18 +88,28 @@ contract launchPadIFO {
         require(padName == padNameInput, "Invalid token name");
 
         pad.startPad = true;
+        emit launched(moderator, _padId, _tokenName);
     }
 
-    function stakeOnPad(
+    function stakeOnPad_(
         uint256 _amount,
         uint256 _padId,
         string memory _tokenName
     ) public payable returns (bool) {
         require(idUsed[_padId], "Pad does not exist");
         require(_amount == msg.value, "Amount must be equal");
+
         Pad storage pad = padIds[_padId];
         require(pad.startPad == true, "Pad not available");
+        bytes32 padNameInput = keccak256(abi.encodePacked(_tokenName));
+        bytes32 padName = keccak256(abi.encodePacked(pad.tokenName));
+        require(padName == padNameInput, "Invalid token name");
+        amountBought[msg.sender][_padId] = _amount;
+
+        emit stakeSuccessful(_amount, _padId, _tokenName);
     }
+
+    fallback() external payable {}
 
     receive() external payable {
         emit Received(msg.sender, msg.value);
