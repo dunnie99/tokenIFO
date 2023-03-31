@@ -64,10 +64,10 @@ contract launchPadIFO {
         require(_padToken != address(0), "tokenContract can't be address zero");
         require(idUsed[_padId] == false, "ID already exists");
         require(launchPadExists[_padToken] == false, "Pad exists already");
-        require(
-            (_tokenPerMinETH / minETH) * _amountEthToRaise >= _totalSupply,
-            "_totalSupply not enough for amountEthToRaise"
-        );
+        // require(
+        //     ((_tokenPerMinETH / minETH) * _amountEthToRaise >= _totalSupply),
+        //     "_totalSupply not enough for amountEthToRaise"
+        // );
 
         idUsed[_padId] = true;
         launchPadExists[_padToken] == true;
@@ -141,7 +141,7 @@ contract launchPadIFO {
         bytes32 padNameInput = keccak256(abi.encodePacked(_tokenName));
         bytes32 padName = keccak256(abi.encodePacked(pad.tokenName));
         require(padName == padNameInput, "Incorrect token name");
-        if (block.timestamp > pad.duration) {
+        if (block.timestamp >= pad.duration) {
             pad.startPad = false;
             launchPadExists[address(pad.padToken)] == false;
         } else {
@@ -154,7 +154,8 @@ contract launchPadIFO {
             msg.sender,
             claimAmount
         );
-        if (transferSuccessful == false) revert("claimAmount transfer failed");
+        require(transferSuccessful, "transfer failed");
+        // if (transferSuccessful == false) revert("claimAmount transfer failed");
         amountBought[msg.sender][_padId] = 0;
         pad.totalSupply -= claimAmount;
 

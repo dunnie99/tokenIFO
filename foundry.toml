@@ -2,6 +2,7 @@
 src = 'src'
 out = 'out'
 libs = ["node_modules", "lib"]
+verbosity = 5
 remappings = [
     '@openzeppelin/=node_modules/@openzeppelin/',
     'eth-gas-reporter/=node_modules/eth-gas-reporter/',
