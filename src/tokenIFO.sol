@@ -180,16 +180,16 @@ contract launchPadIFO {
 
     function transferTokenBal(address _tokenContract, address _to, uint256 _amount) public returns (bool success) {
         require(msg.sender == moderator, "Access denied");
-        require(IERC20(_tokenContract).balanceOf(address(this)) >= _amount, "Insufficient balance");
-        require(IERC20(_tokenContract).transfer(_to, _amount), "Token transfer failed");
+        require(IERC20(_tokenContract).balanceOf(address(this)) >= _amount * 1e18, "Insufficient balance");
+        IERC20(_tokenContract).transfer(_to, _amount);
         success = true;
         return success;
     }
 
-    function withdraw(address payable _to, uint256 _amount) external returns(bool success) {
+    function withdraw(address _to, uint256 _amount) external returns(bool success) {
         require(msg.sender == moderator, "Access denied");
         require(address(this).balance >= _amount, "Insufficient balance");
-        _to.transfer(_amount);
+        payable(_to).transfer(_amount);
         success = true;
         return success;
     }
