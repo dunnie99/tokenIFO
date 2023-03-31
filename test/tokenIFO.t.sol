@@ -98,7 +98,7 @@ contract tokenIFOTest is Test {
         testgetBals();
 
         vm.startPrank(Bob);
-        console.log("DUnnnnnnnnie");
+        console.log("Dunnnnnnnnie");
         launchpad.transferTokenBal(address(rsqtoken), Idogwu, 19980);
         launchpad.getTokenBalance(address(rsqtoken));
         launchpad.withdraw(Idogwu, 0.001 ether);
