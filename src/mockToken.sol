@@ -26,7 +26,7 @@ contract RSQtoken is ERC20 {
 
     function mint(uint amount) public {
         require(msg.sender == owner, "Not owner");
-        _mint(owner, amount * 10**decimals());
+        _mint(owner, amount * 1e18);
         amountMinted[msg.sender] = amount;
     }
 

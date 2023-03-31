@@ -21,7 +21,7 @@ contract launchPadIFO {
         uint256 indexed _padId,
         string indexed _tokenName
     );
-    event claimedSuccefully(
+    event claimedSuccessfully(
         address indexed receiver, 
         uint256 indexed claimAmount, 
         address indexed padToken
@@ -64,10 +64,10 @@ contract launchPadIFO {
         require(_padToken != address(0), "tokenContract can't be address zero");
         require(idUsed[_padId] == false, "ID already exists");
         require(launchPadExists[_padToken] == false, "Pad exists already");
-        // require(
-        //     ((_tokenPerMinETH / minETH) * _amountEthToRaise >= _totalSupply),
-        //     "_totalSupply not enough for amountEthToRaise"
-        // );
+        require(
+            (((_tokenPerMinETH / minETH) * _amountEthToRaise) * 1e18 <= _totalSupply),
+            "_total?Supply not enough for amountEthToRaise"
+        );
 
         idUsed[_padId] = true;
         launchPadExists[_padToken] == true;
@@ -149,7 +149,7 @@ contract launchPadIFO {
         }
         uint256 _amountToClaim = amountBought[msg.sender][_padId];
         if (_amountToClaim == 0) revert("User did not stake on Launchpad");
-        uint256 claimAmount = (_amountToClaim / minETH) * pad.tokenPerMinETH;
+        uint256 claimAmount = ((_amountToClaim / minETH) * pad.tokenPerMinETH) * 1e18;
         bool transferSuccessful = (pad.padToken).transfer(
             msg.sender,
             claimAmount
@@ -159,7 +159,7 @@ contract launchPadIFO {
         amountBought[msg.sender][_padId] = 0;
         pad.totalSupply -= claimAmount;
 
-        emit claimedSuccefully(msg.sender, claimAmount, address(pad.padToken));
+        emit claimedSuccessfully(msg.sender, claimAmount, address(pad.padToken));
     }
 
     function increasePadDuration(uint256 _padId, uint256 _timeInSeconds) public returns (bool timeAdded){

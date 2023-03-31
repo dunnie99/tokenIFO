@@ -28,16 +28,20 @@ contract tokenIFOTest is Test {
         ///////////////////////////////////////////
         vm.startPrank(Alice);
         rsqtoken = new RSQtoken("RASAQ", "RSQ");
-        rsqtoken.mint(2000000000);
+        uint256 supply = 20000000 * 1e18;
+        rsqtoken.mint(supply);
         
         
     }
 
     function testcreatePad() public {
-        rsqtoken.approve(address(launchpad), 2000000);
-        //uint256 supply = (2/0.001) * 1000;
-        //if(supply == 2000000) revert("Good girl, love you!");
-        launchpad.createPad(23, "RASAQ", address(rsqtoken), 2, 100, 2000000);
+        //2000000000000000000000000
+        uint256 approveAmount = 2000000 * 1e18;
+        rsqtoken.approve(address(launchpad), approveAmount);
+        // uint256 create = ( 2 / 0.001 ) * 1000;
+        // console.log(create);
+        // if(approveAmount == (2/0.001)*1000) revert("Good girl, love you!");
+        launchpad.createPad(23, "RASAQ", address(rsqtoken), 2, 1000, approveAmount);
         vm.stopPrank();
     }
 
@@ -60,8 +64,38 @@ contract tokenIFOTest is Test {
         // vm.stopPrank();
         // vm.prank(Idogwu);
         launchpad.claimLaunchPad(23, "RASAQ");
+        console.log("FUNCTION PASSED");
 
     }
+
+    // function testincreasePadDuration() public {
+    //     testclaimLaunchPad();
+    //     vm.stopPrank();
+    //     vm.startPrank(Bob);
+    //     launchpad.increasePadDuration(23, 3600);
+
+    // }
+
+
+    function testgetBals() public {
+        testclaimLaunchPad();
+
+        launchpad.getBalance();
+        launchpad.getTokenBalance(address(rsqtoken));
+        console.log("BALANCE PASSED");
+        //2000 000 000 000 000 000 000
+
+
+    }
+
+
+
+    function testwithdrawal() public {
+        //ether bal => 1 000 000 000 000 000 000;
+        //rsqtoken => 1998000;
+        //2000 000 000 000 000 000 000;
+    }
+
 
 
 
