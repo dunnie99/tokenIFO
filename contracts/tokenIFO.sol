@@ -1,9 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract launchPadIFO {
-    
     event createdPad(
         string indexed tokenName,
         uint256 indexed padId,
@@ -22,11 +21,13 @@ contract launchPadIFO {
         string indexed _tokenName
     );
     event claimedSuccessfully(
-        address indexed receiver, 
-        uint256 indexed claimAmount, 
+        address indexed receiver,
+        uint256 indexed claimAmount,
         address indexed padToken
     );
     event Received(address, uint);
+
+    IERC20 mytoken;
 
     struct Pad {
         uint256 padID;
@@ -65,7 +66,8 @@ contract launchPadIFO {
         require(idUsed[_padId] == false, "ID already exists");
         require(launchPadExists[_padToken] == false, "Pad exists already");
         require(
-            (((_tokenPerMinETH / minETH) * _amountEthToRaise) * 1e18 <= _totalSupply),
+            (((_tokenPerMinETH / minETH) * _amountEthToRaise) * 1e18 <=
+                _totalSupply),
             "_total?Supply not enough for amountEthToRaise"
         );
 
@@ -149,7 +151,8 @@ contract launchPadIFO {
         }
         uint256 _amountToClaim = amountBought[msg.sender][_padId];
         if (_amountToClaim == 0) revert("User did not stake on Launchpad");
-        uint256 claimAmount = ((_amountToClaim / minETH) * pad.tokenPerMinETH) * 1e18;
+        uint256 claimAmount = ((_amountToClaim / minETH) * pad.tokenPerMinETH) *
+            1e18;
         bool transferSuccessful = IERC20(pad.padToken).transfer(
             msg.sender,
             claimAmount
@@ -159,10 +162,17 @@ contract launchPadIFO {
         amountBought[msg.sender][_padId] = 0;
         pad.totalSupply -= claimAmount;
 
-        emit claimedSuccessfully(msg.sender, claimAmount, address(pad.padToken));
+        emit claimedSuccessfully(
+            msg.sender,
+            claimAmount,
+            address(pad.padToken)
+        );
     }
 
-    function increasePadDuration(uint256 _padId, uint256 _timeInSeconds) public returns (bool timeAdded){
+    function increasePadDuration(
+        uint256 _padId,
+        uint256 _timeInSeconds
+    ) public returns (bool timeAdded) {
         require(msg.sender == moderator, "Access denied");
         Pad storage pad = padIds[_padId];
         pad.duration += _timeInSeconds;
@@ -174,19 +184,31 @@ contract launchPadIFO {
         return address(this).balance;
     }
 
-    function getTokenBalance(address _tokenContract) public view returns (uint256) {
-            return IERC20(_tokenContract).balanceOf(address(this));
+    function getTokenBalance(
+        address _tokenContract
+    ) public view returns (uint256) {
+        return IERC20(_tokenContract).balanceOf(address(this));
     }
 
-    function transferTokenBal(address _tokenContract, address _to, uint256 _amount) public returns (bool success) {
+    function transferTokenBal(
+        address _tokenContract,
+        address _to,
+        uint256 _amount
+    ) public returns (bool success) {
         require(msg.sender == moderator, "Access denied");
-        require(IERC20(_tokenContract).balanceOf(address(this)) >= _amount * 1e18, "Insufficient balance");
+        require(
+            IERC20(_tokenContract).balanceOf(address(this)) >= _amount * 1e18,
+            "Insufficient balance"
+        );
         IERC20(_tokenContract).transfer(_to, _amount);
         success = true;
         return success;
     }
 
-    function withdraw(address _to, uint256 _amount) external returns(bool success) {
+    function withdraw(
+        address _to,
+        uint256 _amount
+    ) external returns (bool success) {
         require(msg.sender == moderator, "Access denied");
         require(address(this).balance >= _amount, "Insufficient balance");
         payable(_to).transfer(_amount);
